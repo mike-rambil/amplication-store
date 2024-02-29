@@ -1,17 +1,34 @@
-import { PrismaClient } from "@prisma/client";
+import { faker } from '@faker-js/faker';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { hash } from 'bcrypt';
 
-export async function customSeed() {
+export async function seedUsers(numberOfUsers: number = 10): Promise<void> {
   const client = new PrismaClient();
-  const username = "admin";
 
-  //replace this sample code to populate your database
-  //with data that is required for your service to start
-  await client.user.update({
-    where: { username: username },
-    data: {
-      username,
-    },
-  });
+  async function createUser(): Promise<void> {
+    const saltRounds = 10;
+    const passwordHash = await hash(faker.internet.password(), saltRounds);
 
-  client.$disconnect();
+    await client.user.create({
+      data: {
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        password: passwordHash,
+        roles: ['user'], // Example roles
+        username: faker.internet.userName(),
+      },
+    });
+  }
+
+  try {
+    for (let i = 0; i < numberOfUsers; i++) {
+      await createUser();
+    }
+    console.log(`${numberOfUsers} users created successfully.`);
+  } catch (error) {
+    console.error('Error seeding users:', error);
+  } finally {
+    await client.$disconnect();
+  }
 }
+seedUsers(20);
