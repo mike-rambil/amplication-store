@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
 
-export async function seedUsers(numberOfUsers: number = 10): Promise<void> {
+export async function customSeed(numberOfUsers: number = 10): Promise<void> {
   const client = new PrismaClient();
 
   async function createUser(): Promise<void> {
@@ -31,4 +31,3 @@ export async function seedUsers(numberOfUsers: number = 10): Promise<void> {
     await client.$disconnect();
   }
 }
-seedUsers(20);
